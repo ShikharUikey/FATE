@@ -1,0 +1,27 @@
+# Python Virtual Environments & Cache
+backend/.venv/
+backend/__pycache__/
+backend/.pytest_cache/
+.pytest_cache/
+__pycache__/
+
+# Node Dependencies & Next.js Builds
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+node_modules/
+
+# Tauri & Rust Targets
+src-tauri/target/
+
+# Local SQLite Databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+fate_session.json
+
+# IDE Caches & OS Files
+.DS_Store
+.vscode/
+.idea/

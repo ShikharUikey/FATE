@@ -1,0 +1,14 @@
+[package]
+name = "fate-desktop"
+version = "0.1.0"
+description = "Tauri v2 container shell wrapper for FATE Core"
+edition = "2021"
+rust-version = "1.75"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0-beta", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0-beta", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
