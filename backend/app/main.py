@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.core.security import initialize_security_token, verify_session_token
 from backend.app.core.db import init_db
 from backend.app.api.brain_routes import router as brain_router
+from backend.app.api.memory_routes import router as memory_router
 
 app = FastAPI(
     title="FATE Core API Daemon",
@@ -30,6 +31,7 @@ def on_startup():
 
 # Include routers
 app.include_router(brain_router)
+app.include_router(memory_router)
 
 @app.get("/api/v1/health", dependencies=[Depends(verify_session_token)])
 async def get_health_status():
