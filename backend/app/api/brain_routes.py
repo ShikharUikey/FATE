@@ -8,6 +8,9 @@ from backend.app.core.llm_client import LLMClient
 from backend.app.core.brain import AIBrain
 from backend.app.core.orchestrator import AgentOrchestrator
 
+from backend.app.agents.desktop_agent import DesktopAgent
+from backend.app.agents.filesystem_agent import FileSystemAgent
+
 router = APIRouter(
     prefix="/api/v1/brain",
     tags=["Brain Engine"]
@@ -17,6 +20,8 @@ router = APIRouter(
 llm_client = LLMClient()
 brain = AIBrain(llm_client)
 orchestrator = AgentOrchestrator()
+orchestrator.register_agent("DesktopAgent", DesktopAgent())
+orchestrator.register_agent("FileSystemAgent", FileSystemAgent())
 
 class QueryRequest(BaseModel):
     query: str
