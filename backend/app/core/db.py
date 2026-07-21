@@ -32,6 +32,7 @@ def init_db():
     from backend.app.tools_ecosystem.registry.models import ToolRecord
     from backend.app.mcp.registry.models import MCPToolRecord, MCPPluginRecord
     from backend.app.security_engine.identity.models import IdentityRecord, AuditRecord
+    from backend.app.workflow_engine.designer.models import WorkflowRecord, WorkflowExecutionRecord
     SQLModel.metadata.create_all(engine)
 
 def get_session():
