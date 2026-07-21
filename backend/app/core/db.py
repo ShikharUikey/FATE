@@ -31,6 +31,7 @@ def init_db():
     from backend.app.knowledge_graph.relationships.engine import RelationshipRecord
     from backend.app.tools_ecosystem.registry.models import ToolRecord
     from backend.app.mcp.registry.models import MCPToolRecord, MCPPluginRecord
+    from backend.app.security_engine.identity.models import IdentityRecord, AuditRecord
     SQLModel.metadata.create_all(engine)
 
 def get_session():
