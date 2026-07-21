@@ -27,6 +27,8 @@ def init_db():
         MemoryNodes, MemoryEdges, MemoryObservations,
         ExecutionTraces, AuditLogs
     )
+    from backend.app.knowledge_graph.entities.models import EntityRecord, EntityVersionRecord
+    from backend.app.knowledge_graph.relationships.engine import RelationshipRecord
     SQLModel.metadata.create_all(engine)
 
 def get_session():
