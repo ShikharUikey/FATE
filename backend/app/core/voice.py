@@ -6,10 +6,13 @@ import asyncio
 import subprocess
 from typing import Optional
 
+from backend.app.services.weights_downloader import ModelWeightsDownloader
+
 class SpeechToTextManager:
     """Manages local Faster-Whisper offline transcription and dynamic fallback mechanisms."""
 
     def __init__(self, model_size: str = "tiny"):
+        self.downloader = ModelWeightsDownloader()
         self.model_size = model_size
         self.model = None
         self._initialize_model()
