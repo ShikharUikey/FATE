@@ -8,6 +8,7 @@ from backend.app.api.memory_routes import router as memory_router
 from backend.app.api.voice_routes import router as voice_router, ws_router as voice_ws_router
 from backend.app.knowledge_graph.api.router import router as kg_router
 from backend.app.tools_ecosystem.api.router import router as tools_router
+from backend.app.mcp.api.routes import router as mcp_router
 
 app = FastAPI(
     title="FATE Core API Daemon",
@@ -39,6 +40,7 @@ app.include_router(voice_router)
 app.include_router(voice_ws_router)
 app.include_router(kg_router)
 app.include_router(tools_router)
+app.include_router(mcp_router)
 
 @app.get("/api/v1/health", dependencies=[Depends(verify_session_token)])
 async def get_health_status():

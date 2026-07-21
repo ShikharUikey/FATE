@@ -30,6 +30,7 @@ def init_db():
     from backend.app.knowledge_graph.entities.models import EntityRecord, EntityVersionRecord
     from backend.app.knowledge_graph.relationships.engine import RelationshipRecord
     from backend.app.tools_ecosystem.registry.models import ToolRecord
+    from backend.app.mcp.registry.models import MCPToolRecord, MCPPluginRecord
     SQLModel.metadata.create_all(engine)
 
 def get_session():
