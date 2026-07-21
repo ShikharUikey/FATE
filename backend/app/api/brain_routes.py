@@ -12,6 +12,9 @@ from backend.app.agents.desktop_agent import DesktopAgent
 from backend.app.agents.filesystem_agent import FileSystemAgent
 from backend.app.agents.browser_agent import BrowserAgent
 from backend.app.agents.vision_agent import VisionAgent
+from backend.app.agents.calendar_agent import CalendarAgent
+from backend.app.agents.communication_agent import CommunicationAgent
+from backend.app.agents.coding_agent import CodingAgent
 
 router = APIRouter(
     prefix="/api/v1/brain",
@@ -26,6 +29,9 @@ orchestrator.register_agent("DesktopAgent", DesktopAgent())
 orchestrator.register_agent("FileSystemAgent", FileSystemAgent())
 orchestrator.register_agent("BrowserAgent", BrowserAgent())
 orchestrator.register_agent("VisionAgent", VisionAgent())
+orchestrator.register_agent("CalendarAgent", CalendarAgent())
+orchestrator.register_agent("CommunicationAgent", CommunicationAgent())
+orchestrator.register_agent("CodingAgent", CodingAgent())
 
 class QueryRequest(BaseModel):
     query: str
