@@ -21,6 +21,7 @@ from backend.app.agent_factory.api.routes import router as agent_factory_router
 from backend.app.predictive_engine.api.routes import router as predictive_engine_router
 from backend.app.evolution_engine.api.routes import router as evolution_engine_router
 from backend.app.jarvis_core.api.routes import router as jarvis_core_router
+from backend.app.gemini_live.api.routes import router as gemini_live_router
 
 app = FastAPI(
     title="FATE Core API Daemon",
@@ -65,6 +66,7 @@ app.include_router(agent_factory_router)
 app.include_router(predictive_engine_router)
 app.include_router(evolution_engine_router)
 app.include_router(jarvis_core_router)
+app.include_router(gemini_live_router)
 
 @app.get("/api/v1/health", dependencies=[Depends(verify_session_token)])
 async def get_health_status():
