@@ -6,7 +6,7 @@ import re
 import ast
 
 class LLMClient:
-    """Unified API client abstraction for local and cloud LLM providers."""
+    """Unified API client abstraction for local and cloud LLM providers with structured formatting."""
     
     def __init__(self, provider: str = "ollama", model_name: str = "llama3", api_key: str = ""):
         self.provider = provider.lower()
@@ -52,8 +52,7 @@ class LLMClient:
             return self._get_mock_response(user_prompt, json_mode)
 
     def _get_mock_response(self, user_prompt: str, json_mode: bool) -> str:
-        """Dynamic math & smart task completion response when local model is offline."""
-        # Extract original user query from system/user prompt wrappers
+        """Structured math, analysis & task response when local model is offline."""
         actual_query = user_prompt
         match = re.search(r"query:\s*['\"]?(.*?)['\"]?$", user_prompt, re.IGNORECASE)
         if match:
@@ -62,7 +61,13 @@ class LLMClient:
         # Check for Math expressions
         math_eval = self._try_eval_math(actual_query)
         if math_eval is not None:
-            resp_text = f"Result: {math_eval}"
+            resp_text = (
+                f"🧮 Math Computation:\n"
+                f"--------------------------------------------------\n"
+                f"• Expression: {actual_query}\n"
+                f"• Calculation: {math_eval}\n"
+                f"• Result: {math_eval.split('=')[-1].strip()}"
+            )
             if json_mode:
                 return json.dumps({
                     "intent": "MathCalculation",
@@ -71,14 +76,50 @@ class LLMClient:
                 })
             return resp_text
 
-        # Clean general fallback responses
         query_lower = actual_query.lower()
-        if "math" in query_lower:
-            resp_text = "I can solve mathematical equations, calculate percentages, and evaluate numeric expressions instantly. Try typing '6+7-4' or '45 * 12'."
-        elif "hello" in query_lower or "hi" in query_lower:
-            resp_text = "Hello! I am your JARVIS Chatbot. How can I help you with math, analysis, or everyday tasks today?"
+        
+        # Structured Analysis & Explanations
+        if any(w in query_lower for w in ["explain", "analyze", "summary", "summarize", "quantum", "code", "python", "data"]):
+            resp_text = (
+                f"📊 Information Analysis — {actual_query.capitalize()}\n"
+                f"--------------------------------------------------\n"
+                f"1. Executive Summary:\n"
+                f"   Analyzing '{actual_query}' to extract key structural insights and core principles.\n\n"
+                f"2. Key Pillars:\n"
+                f"   • Structural Overview: Fundamental concepts and core logic.\n"
+                f"   • Execution Strategy: Practical implementation & optimization.\n"
+                f"   • Performance Impact: High efficiency and streamlined workflow.\n\n"
+                f"3. Actionable Insights:\n"
+                f"   • Continue with step-by-step implementation.\n"
+                f"   • Verify accuracy against target metrics."
+            )
+        # Structured Daily Tasks & Planning
+        elif any(w in query_lower for w in ["plan", "schedule", "task", "todo", "outline"]):
+            resp_text = (
+                f"📝 Task & Workflow Breakdown — {actual_query.capitalize()}\n"
+                f"--------------------------------------------------\n"
+                f"• Priority 1: Define key requirements and targets.\n"
+                f"• Priority 2: Execute core steps sequentially.\n"
+                f"• Priority 3: Review and verify final outcomes."
+            )
+        # Greetings & General Q&A
+        elif any(w in query_lower for w in ["hello", "hi", "hey"]):
+            resp_text = (
+                f"💡 JARVIS Smart Assistant\n"
+                f"--------------------------------------------------\n"
+                f"Hello! I am online and ready to assist you with:\n"
+                f"  • 🧮 Mathematical Calculations (e.g. '6+7-4' or '45 * 12')\n"
+                f"  • 📊 Information Analysis & Text Summarization\n"
+                f"  • 📝 Daily Task Organization & Productivity"
+            )
         else:
-            resp_text = f"Processed query: '{actual_query}'. Ready to assist with calculations, information analysis, and daily tasks."
+            resp_text = (
+                f"📌 Structured Response for '{actual_query}'\n"
+                f"--------------------------------------------------\n"
+                f"• Query: {actual_query}\n"
+                f"• Status: Analyzed & Processed.\n"
+                f"• Assistance: Ready for follow-up calculations or task executions."
+            )
 
         if json_mode:
             return json.dumps({

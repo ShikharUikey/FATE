@@ -22,7 +22,12 @@ class AIBrain:
                 valid = all(isinstance(n, (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Constant, ast.Num, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow)) for n in ast.walk(node))
                 if valid:
                     res = eval(compile(node, filename='<ast>', mode='eval'))
-                    return f"{expr} = {res}"
+                    return (
+                        f"\n🧮 Math Computation:\n"
+                        f"--------------------------------------------------\n"
+                        f"• Expression : {expr}\n"
+                        f"• Result     : {res}"
+                    )
             except Exception:
                 pass
         return None
@@ -32,7 +37,7 @@ class AIBrain:
         # 1. Quick Math Evaluation Check
         math_result = self._eval_math_direct(query)
         if math_result is not None:
-            return f"Result: {math_result}", []
+            return math_result, []
 
         # 2. General Query & Planning Prompt
         system_prompt = (
@@ -53,7 +58,7 @@ class AIBrain:
         try:
             plan_data = json.loads(llm_response)
         except Exception:
-            return f"Processed query: '{query}'. How else can I help?", []
+            return f"Processed query: '{query}'. Ready to assist.", []
 
         response_text = plan_data.get("response_text", f"Processed query: '{query}'.")
         tasks_raw = plan_data.get("tasks", [])

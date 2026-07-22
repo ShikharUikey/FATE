@@ -11,12 +11,12 @@ client = TestClient(app)
 
 @pytest.mark.asyncio
 async def test_llm_client_mock_mode():
-    """Verify that the LLM client handles fallback outputs cleanly without dummy email hardcodes."""
+    """Verify that the LLM client handles fallback outputs cleanly in structured Markdown format."""
     llm = LLMClient(provider="mock")
     res = await llm.generate_response("system", "Explain quantum computing", json_mode=True)
     parsed = json.loads(res)
     assert parsed["intent"] == "GeneralQuery"
-    assert "Processed query" in parsed["response_text"] or "Quantum" in parsed["response_text"]
+    assert "Information Analysis" in parsed["response_text"] or "Explain" in parsed["response_text"]
 
 @pytest.mark.asyncio
 async def test_ai_brain_math_and_query_generation():
@@ -33,7 +33,7 @@ async def test_ai_brain_math_and_query_generation():
     # Test general task query
     plan_id_2 = uuid4()
     resp_general, tasks_gen = await brain.generate_plan_dag(plan_id_2, "Analyze weekly progress report")
-    assert "Processed query" in resp_general or "Analyze" in resp_general
+    assert "Information Analysis" in resp_general or "Analyze" in resp_general
 
 def test_query_route_authentication():
     """Verify that FastAPI endpoints require a valid security token."""
