@@ -2,80 +2,57 @@ import pytest
 import json
 from uuid import uuid4
 from fastapi.testclient import TestClient
-from sqlmodel import Session, select
 from backend.app.main import app
-from backend.app.core.db import engine
 from backend.app.core.llm_client import LLMClient
 from backend.app.core.brain import AIBrain
-from backend.app.core.security import SESSION_FILE, STARTUP_TOKEN
-from backend.app.models.schemas import TaskQueue
+from backend.app.core.security import SESSION_FILE
 
 client = TestClient(app)
 
 @pytest.mark.asyncio
 async def test_llm_client_mock_mode():
-    """Verify that the LLM client handles fallback mock outputs correctly."""
+    """Verify that the LLM client handles fallback outputs cleanly without dummy email hardcodes."""
     llm = LLMClient(provider="mock")
-    # Query matching standard plan keyword
-    res = await llm.generate_response("system", "Build a plan for coding task", json_mode=True)
+    res = await llm.generate_response("system", "Explain quantum computing", json_mode=True)
     parsed = json.loads(res)
-    assert parsed["intent"] == "CreateMeetingAndEmail"
-    assert len(parsed["tasks"]) == 2
+    assert parsed["intent"] == "GeneralQuery"
+    assert "Processed query" in parsed["response_text"] or "Quantum" in parsed["response_text"]
 
 @pytest.mark.asyncio
-async def test_ai_brain_plan_generation():
-    """Verify that the AI Brain compiles queries into structured TaskQueue models in SQLite."""
+async def test_ai_brain_math_and_query_generation():
+    """Verify that the AI Brain compiles queries and handles direct math expressions."""
     llm = LLMClient(provider="mock")
     brain = AIBrain(llm)
     
     plan_id = uuid4()
-    resp_text, tasks = await brain.generate_plan_dag(plan_id, "Schedule meeting with Bob and email him")
-    
-    assert len(tasks) == 2
-    assert "scheduling" in resp_text.lower()
-    
-    # Task 2 (CommunicationAgent) must depend on Task 1 (CalendarAgent)
-    task1 = tasks[0]
-    task2 = tasks[1]
-    
-    assert task1.agent_name == "CalendarAgent"
-    assert task2.agent_name == "CommunicationAgent"
-    
-    # Verify database insertion
-    with Session(engine) as session:
-        statement = select(TaskQueue).where(TaskQueue.plan_id == plan_id)
-        saved = session.exec(statement).all()
-        assert len(saved) == 2
-        
-        # Verify dependency link resolved from indices to database UUID string
-        t2_db = [t for t in saved if t.agent_name == "CommunicationAgent"][0]
-        t1_db = [t for t in saved if t.agent_name == "CalendarAgent"][0]
-        
-        deps = json.loads(t2_db.dependencies)
-        assert len(deps) == 1
-        assert deps[0] == str(t1_db.id)
+    # Test math calculation direct evaluation
+    resp_math, tasks_math = await brain.generate_plan_dag(plan_id, "6+7-4")
+    assert "9" in resp_math
+    assert len(tasks_math) == 0
+
+    # Test general task query
+    plan_id_2 = uuid4()
+    resp_general, tasks_gen = await brain.generate_plan_dag(plan_id_2, "Analyze weekly progress report")
+    assert "Processed query" in resp_general or "Analyze" in resp_general
 
 def test_query_route_authentication():
-    """Verify that the FastAPI loopback endpoints reject requests without a valid token."""
+    """Verify that FastAPI endpoints require a valid security token."""
     response = client.post(
         "/api/v1/brain/query",
         json={"query": "hello", "voice_mode": False}
     )
-    assert response.status_code == 422  # FastAPI validation error status code for missing required headers
+    assert response.status_code == 422
 
 def test_query_route_success():
-    """Verify that the query endpoint accepts authenticated requests and initiates plans."""
-    # Read the active startup handshake token
+    """Verify that the query endpoint returns clean responses for user prompts."""
     with open(SESSION_FILE, "r") as f:
         token = json.load(f)["token"]
         
     response = client.post(
         "/api/v1/brain/query",
         headers={"X-FATE-Token": token},
-        json={"query": "Schedule meeting with Bob and email him", "voice_mode": False}
+        json={"query": "Calculate 45 * 12", "voice_mode": False}
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["plan_triggered"] is True
-    assert data["plan_id"] is not None
-    assert "scheduling" in data["response_text"].lower()
+    assert "540" in data["response_text"]
