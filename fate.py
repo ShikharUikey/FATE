@@ -2,10 +2,11 @@
 """
 FATE — Fully Automated Task Executive Unified CLI Manager
 Usage:
-    python fate.py start   - Launch Backend (port 8000) & Frontend (port 1420)
-    python fate.py stop    - Terminate running local host servers
-    python fate.py test    - Execute backend unit test suite (23 tests)
-    python fate.py status  - Check system daemon health and port statuses
+    python3 fate.py chat    - Launch Interactive AI Chatbot Terminal
+    python3 fate.py start   - Launch Backend (port 8000) & Frontend (port 1420)
+    python3 fate.py stop    - Terminate running local host servers
+    python3 fate.py test    - Execute backend unit test suite
+    python3 fate.py status  - Check system daemon health and port statuses
 """
 
 import sys
@@ -93,6 +94,38 @@ def start_services():
     print("  [✓] Frontend GUI launched at http://localhost:1420")
     print("\nFATE Core is now running live!")
 
+def run_interactive_chat():
+    """Runs interactive terminal chatbot shell."""
+    print("\n🤖 JARVIS AI Chatbot Interactive Terminal Shell")
+    print("--------------------------------------------------")
+    print("Type your questions (Maths, Info Analysis, Everyday Tasks). Type 'exit' to quit.\n")
+    
+    # Ensure backend server is running or query internal brain directly
+    py_bin = os.path.join(BACKEND_DIR, ".venv", "bin", "python")
+    code_snippet = (
+        "import asyncio\n"
+        "from backend.app.core.llm_client import LLMClient\n"
+        "from backend.app.core.brain import AIBrain\n"
+        "from uuid import uuid4\n\n"
+        "async def main():\n"
+        "    brain = AIBrain(LLMClient())\n"
+        "    while True:\n"
+        "        try:\n"
+        "            user_input = input('\\nUser > ').strip()\n"
+        "            if user_input.lower() in ['exit', 'quit']:\n"
+        "                break\n"
+        "            if not user_input:\n"
+        "                continue\n"
+        "            res, tasks = await brain.generate_plan_dag(uuid4(), user_input)\n"
+        "            print(f'\\nJARVIS > {res}')\n"
+        "        except (KeyboardInterrupt, EOFError):\n"
+        "            break\n\n"
+        "asyncio.run(main())\n"
+    )
+    env = os.environ.copy()
+    env["PYTHONPATH"] = ROOT_DIR
+    subprocess.run([py_bin, "-c", code_snippet], cwd=ROOT_DIR, env=env)
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -108,6 +141,8 @@ def main():
         sys.exit(0 if success else 1)
     elif cmd == "status":
         check_status()
+    elif cmd in ["chat", "chatbot"]:
+        run_interactive_chat()
     else:
         print(f"Unknown command: {cmd}\n")
         print(__doc__)
