@@ -20,7 +20,7 @@ FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
 
 def run_tests():
     """Executes the full PyTest suite inside the backend virtual environment."""
-    print("Running FATE Core Test Suite (80 test cases)...")
+    print("Running FATE Core Test Suite (89 test cases)...")
     pytest_bin = os.path.join(BACKEND_DIR, ".venv", "bin", "pytest")
     test_files = [
         "tests/test_core.py",
@@ -37,7 +37,8 @@ def run_tests():
         "tests/test_desktop_os_agent.py",
         "tests/test_security_engine.py",
         "tests/test_workflow_engine.py",
-        "tests/test_browser_agent_module.py"
+        "tests/test_browser_agent_module.py",
+        "tests/test_mobile_agent_module.py"
     ]
     
     cmd = [pytest_bin] + test_files
