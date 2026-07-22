@@ -14,6 +14,7 @@ from backend.app.security_engine.api.routes import router as security_router
 from backend.app.workflow_engine.api.routes import router as workflow_router
 from backend.app.browser_agent.api.routes import router as browser_agent_router
 from backend.app.mobile_agent.api.routes import router as mobile_agent_router
+from backend.app.cloud_engine.api.routes import router as cloud_engine_router
 
 app = FastAPI(
     title="FATE Core API Daemon",
@@ -51,6 +52,7 @@ app.include_router(security_router)
 app.include_router(workflow_router)
 app.include_router(browser_agent_router)
 app.include_router(mobile_agent_router)
+app.include_router(cloud_engine_router)
 
 @app.get("/api/v1/health", dependencies=[Depends(verify_session_token)])
 async def get_health_status():
